@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form method="post"> {% csrf_token %}
+        {% for padawan in padawans %}
+            <p>
+                Имя: {{ padawan.name }} <br>
+                Возраст: {{ padawan.age }} <br>
+                Планета: {{ padawan.planet.title }} <br>
+                {% if padawan.result_test %}
+                    Результат: {{ padawan.result_test }} <br>
+                {% endif %}
+                <input type="checkbox" name="{{ padawan.pk }}" value="select">
+            </p> <br>
+        {% endfor %}
+        <input type="submit" value="Взять в падаваны">
+    </form>
+</body>
+</html>

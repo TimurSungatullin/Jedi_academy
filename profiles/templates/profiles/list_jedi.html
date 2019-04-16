@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% for jedi in jedis %}
+        <a href="{% url 'jedi' jedi.id %}">
+            <p>
+                Имя: {{ jedi.name }}
+                Ордин: {{ jedi.order.name }}
+            </p>
+        </a>
+    {% endfor %}
+</body>
+</html>
