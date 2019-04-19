@@ -38,8 +38,9 @@ def jedi(request, id):
                     pad.jedi = jedi
                     pad.save()
                 except SMTPAuthenticationError:
+                    pad.delete()
                     continue
-        return HttpResponse("Падаваны зачислены!")
+        return HttpResponse("Всё!")
     return render(request, "profiles/profile_jedi.html", {"padawans": padawans})
 
 
