@@ -1,3 +1,5 @@
+from smtplib import SMTPAuthenticationError
+
 from django.core.mail import send_mail, EmailMessage
 from django.db.models import Count
 from django.http import HttpResponse
