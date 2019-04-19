@@ -5,19 +5,21 @@
     <title>Title</title>
 </head>
 <body>
+    {% if padawans %}
     <form method="post"> {% csrf_token %}
         {% for padawan in padawans %}
             <p>
                 Имя: {{ padawan.name }} <br>
                 Возраст: {{ padawan.age }} <br>
                 Планета: {{ padawan.planet.title }} <br>
-                {% if padawan.result_test %}
-                    Результат: {{ padawan.result_test }} <br>
-                {% endif %}
+                Результат: {{ padawan.result_test }} <br>
                 <input type="checkbox" name="{{ padawan.pk }}" value="select">
             </p> <br>
         {% endfor %}
         <input type="submit" value="Взять в падаваны">
     </form>
+    {% else %}
+        Падаванов пока нет
+    {% endif %}
 </body>
 </html>

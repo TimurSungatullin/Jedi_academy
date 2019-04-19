@@ -1,3 +1,5 @@
+from django.core.mail import send_mail, EmailMessage
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
@@ -8,18 +10,30 @@ from tests.models import Test
 
 
 def list_jedi(request):
-    jedis = Jedi.objects.all()
+    if request.POST:
+        jedis = Jedi.objects.annotate(count_padawan=Count("padawan_jedi")).filter(count_padawan__gt=1)
+    else:
+        jedis = Jedi.objects.select_related().all()
     return render(request, "profiles/list_jedi.html", {"jedis": jedis})
 
 
 def jedi(request, id):
     jedi = Jedi.objects.get(id=id)
-    padawans = Padawan.objects.filter(planet=jedi.order.planet.pk, jedi=None).order_by("-result_test")
+    if jedi.count_padawan() >= 3:
+        return HttpResponse("Вам уже хватит падаванов")
+    padawans = Padawan.objects.\
+        filter(planet=jedi.order.planet.pk, jedi=None).\
+        exclude(result_test=None).\
+        order_by("-result_test")
     if request.POST:
+        mails_padawans = []
         for pad in padawans:
             if str(pad.pk) in request.POST:
                 pad.jedi = jedi
+                mails_padawans.append(pad.email)
                 pad.save()
+        email = EmailMessage('Jedi academy', 'Вы зачислены в падаваны к %s' % jedi.name, to=mails_padawans)
+        email.send()
         return HttpResponse("Падаваны зачислены!")
     return render(request, "profiles/profile_jedi.html", {"padawans": padawans})
 

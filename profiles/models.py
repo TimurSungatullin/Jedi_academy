@@ -38,6 +38,9 @@ class Jedi(models.Model):
                               verbose_name="Ордин",
                               related_name="jedi_order")
 
+    def count_padawan(self):
+        return Padawan.objects.filter(jedi=self).count()
+
     def __str__(self):
         return self.name
 

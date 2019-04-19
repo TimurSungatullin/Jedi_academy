@@ -13,7 +13,7 @@ def view_test(request, id):
         result = 0
         questions = test.questions.all()
         for question in questions:
-            if (question.correct_answer == (str(question.pk) in request.POST)):
+            if question.correct_answer == (str(question.pk) in request.POST):
                 result += 1
         result = result / questions.count() * 100
         padawan = Padawan.objects.get(pk=request.session["padawan"])

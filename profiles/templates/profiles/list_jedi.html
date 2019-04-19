@@ -5,11 +5,16 @@
     <title>Title</title>
 </head>
 <body>
+    <form method="post"> {% csrf_token %}
+        <input type="hidden" name="gt">
+        <input type="submit" value="Показать Джедаев, у кого больше 1 падавана">
+    </form>
     {% for jedi in jedis %}
         <a href="{% url 'jedi' jedi.id %}">
             <p>
                 Имя: {{ jedi.name }}
                 Ордин: {{ jedi.order.name }}
+                Число падаванов: {{ jedi.count_padawan }}
             </p>
         </a>
     {% endfor %}
