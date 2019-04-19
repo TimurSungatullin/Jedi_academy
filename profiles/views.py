@@ -32,6 +32,7 @@ def jedi(request, id):
         for pad in padawans:
             if str(pad.pk) in request.POST:
                 mails_padawans.append(pad.email)
+                email = EmailMessage('Jedi academy', 'Вы зачислены в падаваны к %s' % jedi.name, to=mails_padawans)
                 try:
                     email.send()
                     pad.jedi = jedi
