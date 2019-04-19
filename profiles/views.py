@@ -29,11 +29,13 @@ def jedi(request, id):
         mails_padawans = []
         for pad in padawans:
             if str(pad.pk) in request.POST:
-                pad.jedi = jedi
                 mails_padawans.append(pad.email)
-                pad.save()
-        email = EmailMessage('Jedi academy', 'Вы зачислены в падаваны к %s' % jedi.name, to=mails_padawans)
-        email.send()
+                try:
+                    email.send()
+                    pad.jedi = jedi
+                    pad.save()
+                except SMTPAuthenticationError:
+                    continue
         return HttpResponse("Падаваны зачислены!")
     return render(request, "profiles/profile_jedi.html", {"padawans": padawans})
 
