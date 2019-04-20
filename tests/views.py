@@ -1,3 +1,4 @@
+from django.db.models import Count, F, Q
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -10,12 +11,12 @@ def view_test(request, id):
         return HttpResponse("Вы не падаван")
     test = Test.objects.prefetch_related("questions").get(pk=id)
     if request.POST:
-        result = 0
-        questions = test.questions.all()
-        for question in questions:
-            if question.correct_answer == (str(question.pk) in request.POST):
-                result += 1
-        result = result / questions.count() * 100
+        correct_answer = Q(correct_answer=True)
+        selected_answer = Q(pk__in=request.POST.getlist('pk'))
+        correct_questions = (correct_answer & selected_answer) | (~correct_answer & ~ selected_answer)
+        questions = test.questions.aggregate(all_questions=Count('pk'),
+                                             correct_questions=Count('pk', filter=correct_questions))
+        result = questions['correct_questions'] / questions['all_questions'] * 100
         padawan = Padawan.objects.get(pk=request.session["padawan"])
         padawan.result_test = result
         padawan.save()

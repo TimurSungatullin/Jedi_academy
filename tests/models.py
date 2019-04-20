@@ -22,7 +22,7 @@ class Test(models.Model):
 
     title = models.CharField(max_length=100, verbose_name="Название")
     order = models.ForeignKey(Order,
-                              on_delete=models.PROTECT,
+                              on_delete=models.CASCADE,
                               verbose_name="Ордер",
                               related_name="test_order")
     questions = models.ManyToManyField(Question,
