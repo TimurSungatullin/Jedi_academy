@@ -19,12 +19,19 @@ class Order(models.Model):
 
     name = models.CharField(max_length=100, verbose_name="Название")
     planet = models.OneToOneField(Planet,
-                                  on_delete=models.PROTECT,
+                                  on_delete=models.CASCADE,
                                   verbose_name="Планета",
                                   related_name="order_planet")
 
     def __str__(self):
         return self.name
+
+
+class JediManager(models.Manager):
+
+    @staticmethod
+    def count_padawan(id):
+        return Padawan.objects.filter(jedi=id).count()
 
 
 class Jedi(models.Model):
@@ -37,9 +44,7 @@ class Jedi(models.Model):
                               on_delete=models.PROTECT,
                               verbose_name="Ордин",
                               related_name="jedi_order")
-
-    def count_padawan(self):
-        return Padawan.objects.filter(jedi=self).count()
+    count = JediManager()
 
     def __str__(self):
         return self.name
@@ -61,7 +66,7 @@ class Padawan(models.Model):
                                                    blank=True,
                                                    null=True)
     jedi = models.ForeignKey(Jedi,
-                             on_delete=models.PROTECT,
+                             on_delete=models.SET_NULL,
                              verbose_name="Джедай",
                              blank=True,
                              null=True,

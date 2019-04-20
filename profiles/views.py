@@ -1,7 +1,8 @@
 from smtplib import SMTPAuthenticationError
 
-from django.core.mail import send_mail, EmailMessage
-from django.db.models import Count
+from django.core import mail
+from django.core.mail import EmailMessage
+from django.db.models import Count, F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
@@ -20,27 +21,23 @@ def list_jedi(request):
 
 
 def jedi(request, id):
-    jedi = Jedi.objects.get(id=id)
-    if jedi.count_padawan() >= 3:
+    count_padawans = Jedi.objects.count()
+    if count_padawans >= 3:
         return HttpResponse("Вам уже хватит падаванов")
-    padawans = Padawan.objects.\
-        filter(planet=jedi.order.planet.pk, jedi=None).\
-        exclude(result_test=None).\
+    padawans = Padawan.objects. \
+        filter(planet=jedi.order.planet.pk, jedi=None). \
+        exclude(result_test=None). \
         order_by("-result_test")
     if request.POST:
-        mails_padawans = []
+        mails_padawans = padawans.only("email").filter(pk__in=request.POST.getlist('pk'))
+        if count_padawans + mails_padawans.count() >= 3:
+            return HttpResponse("Вы выбрали слишком много учеников")
+        mails = [mail_padawan.email for mail_padawan in mails_padawans]
+        email = EmailMessage('Jedi academy', 'Вы зачислены в падаваны', to=mails)
+        email.send()
         for pad in padawans:
-            if str(pad.pk) in request.POST:
-                mails_padawans.append(pad.email)
-                email = EmailMessage('Jedi academy', 'Вы зачислены в падаваны к %s' % jedi.name, to=mails_padawans)
-                try:
-                    email.send()
-                    pad.jedi = jedi
-                    pad.save()
-                except SMTPAuthenticationError:
-                    pad.delete()
-                    continue
-        return HttpResponse("Всё!")
+            pad.jedi = id
+            pad.save()
     return render(request, "profiles/profile_jedi.html", {"padawans": padawans})
 
 
@@ -48,12 +45,14 @@ def padawan(request):
     form = LoginForm()
     if request.POST:
         new_padawan = LoginForm(request.POST)
-        new_padawan = new_padawan.save()
-        request.session["padawan"] = new_padawan.id
-        test = Test.objects.only("id").filter(order__planet__id=new_padawan.planet.id).first()
-        if test is None:
-            return HttpResponse("Для вашей планеты ещё нет теста")
-        return redirect(reverse("test", args=[test.id]))
+        if new_padawan.is_valid():
+            new_padawan = new_padawan.save()
+            request.session["padawan"] = new_padawan.id
+            test = Test.objects.only("id").filter(order__planet__id=new_padawan.planet.id).first()
+            if test is None:
+                return HttpResponse("Для вашей планеты ещё нет теста")
+            return redirect(reverse("test", args=[test.id]))
+        return HttpResponse("Данные не верны")
     return render(request, "profiles/authorization.html", {"form": form})
 
 
