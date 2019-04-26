@@ -44,7 +44,7 @@ class Jedi(models.Model):
                               on_delete=models.PROTECT,
                               verbose_name="Ордин",
                               related_name="jedi_order")
-    count = JediManager()
+    objects = JediManager()
 
     def __str__(self):
         return self.name
@@ -62,9 +62,11 @@ class Padawan(models.Model):
                                related_name="padawan_planet")
     age = models.PositiveSmallIntegerField("Возраст")
     email = models.EmailField(verbose_name="E-mail")
-    result_test = models.PositiveSmallIntegerField(verbose_name="Результат Теста",
-                                                   blank=True,
-                                                   null=True)
+    result_test = models.PositiveSmallIntegerField(
+        verbose_name="Результат Теста",
+        blank=True,
+        null=True
+    )
     jedi = models.ForeignKey(Jedi,
                              on_delete=models.SET_NULL,
                              verbose_name="Джедай",
