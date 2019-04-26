@@ -13,12 +13,21 @@ def view_test(request, id):
     if request.POST:
         correct_answer = Q(correct_answer=True)
         selected_answer = Q(pk__in=request.POST.getlist('pk'))
-        correct_questions = (correct_answer & selected_answer) | (~correct_answer & ~ selected_answer)
-        questions = test.questions.aggregate(all_questions=Count('pk'),
-                                             correct_questions=Count('pk', filter=correct_questions))
-        result = questions['correct_questions'] / questions['all_questions'] * 100
+        correct_questions = (correct_answer & selected_answer) | \
+                            (~correct_answer & ~selected_answer)
+        questions = test.questions.aggregate(
+            all_questions=Count('pk'),
+            correct_questions=Count(
+                'pk',
+                filter=correct_questions
+            )
+        )
+        result = questions['correct_questions'] / questions['all_questions']
+        result = result * 100
         padawan = Padawan.objects.get(pk=request.session["padawan"])
         padawan.result_test = result
         padawan.save()
-        return HttpResponse("Ваш резуьтат %d. Ожидайте письма от ордера джедаев" % result)
+        return HttpResponse(
+            "Ваш резуьтат %d. Ожидайте письма от ордера джедаев" % result
+        )
     return render(request, "tests/test.html", {"test": test})
