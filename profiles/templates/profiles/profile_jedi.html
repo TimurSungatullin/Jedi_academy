@@ -6,18 +6,18 @@
 </head>
 <body>
     {% if padawans %}
-    <form method="post"> {% csrf_token %}
-        {% for padawan in padawans %}
-            <p>
-                Имя: {{ padawan.name }} <br>
-                Возраст: {{ padawan.age }} <br>
-                Планета: {{ padawan.planet.title }} <br>
-                Результат: {{ padawan.result_test }} <br>
-                <input type="checkbox" name="{{ padawan.pk }}" value="select">
-            </p> <br>
-        {% endfor %}
-        <input type="submit" value="Взять в падаваны">
-    </form>
+        <form method="post"> {% csrf_token %}
+            {% for padawan in padawans %}
+                <p>
+                    Имя: {{ padawan.name }} <br>
+                    Возраст: {{ padawan.age }} <br>
+                    Планета: {{ padawan.planet.title }} <br>
+                    Результат: {{ padawan.result_test }} <br>
+                    <input type="checkbox" name="pk" value="{{ padawan.pk }}">
+                </p> <br>
+            {% endfor %}
+            <input type="submit" value="Взять в падаваны">
+        </form>
     {% else %}
         Падаванов пока нет
     {% endif %}
