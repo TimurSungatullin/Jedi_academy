@@ -25,7 +25,7 @@ SECRET_KEY = 'j5qq(b(dhgef-aw)09u98eg=8o7i@a7c(!$pkll7_u$v9*kdw$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://jedi-academy1223.herokuapp.com"]
+ALLOWED_HOSTS = ["jedi-academy1223.herokuapp.com"]
 
 
 # Application definition
